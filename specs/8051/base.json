@@ -1,0 +1,48 @@
+{
+    "name": "Intel 8051",
+    "includes": [],
+    "options": [],
+    "opcodes": [
+        {
+            "mask": "0000'0000",
+            "format": "NOP"
+        },
+        {
+            "mask": "0000'0001 AAAA'AAAA",
+            "format": "AJMP page0 #0x{A:02X}"
+        },
+        {
+            "mask": "0000'0010 AAAA'AAAA AAAA'AAAA",
+            "format": "LJMP {A}"
+        },
+        {
+            "mask": "0000'0011",
+            "format": "RR A"
+        },
+        {
+            "mask": "0000'0100",
+            "format": "INC A"
+        },
+        {
+            "mask": "0000'0101 AAAA'AAAA",
+            "format": "INC {A}"
+        },
+        {
+            "mask": "0000'0110",
+            "format": "INC @R0"
+        },
+        {
+            "mask": "0000'0111",
+            "format": "INC @R1"
+        },
+        {
+            "mask": "0000'1RRR",
+            "format": "INC R{R}"
+        },
+        {
+            "mask": "1010'0011",
+            "format": "INC DPTR"
+        }
+
+    ]
+}

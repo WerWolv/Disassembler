@@ -1,0 +1,6 @@
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json
+[submodule "external/libwolv"]
+	path = external/libwolv
+	url = https://github.com/WerWolv/libwolv

@@ -3,8 +3,13 @@ project(libdisassembler)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_library(libdisassembler INTERFACE
-
+add_library(libdisassembler STATIC
+    source/spec/loader.cpp
+    source/spec/spec.cpp
+    source/spec/bit_pattern.cpp
+    source/spec/opcode.cpp
 )
 
-target_include_directories(libdisassembler INTERFACE include)
+target_include_directories(libdisassembler PUBLIC include)
+target_link_libraries(libdisassembler PUBLIC nlohmann_json wolv::types wolv::utils wolv::io wolv::math_eval)
+target_compile_options(libdisassembler PUBLIC -Wall -Wextra -Wpedantic -Werror)
