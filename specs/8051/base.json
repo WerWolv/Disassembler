@@ -140,6 +140,10 @@
             "format": "MOVX A, @R{R}"
         },
         {
+            "mask": "0111'011R AAAA'AAAA",
+            "format": "MOV @R{R}, #0x{A:02X}"
+        },
+        {
             "mask": "0111'1RRR AAAA'AAAA",
             "format": "MOV R{R}, #0x{A:02X}"
         },
@@ -256,6 +260,10 @@
             "format": "SETB C"
         },
         {
+            "mask": "0101'0010 AAAA'AAAA",
+            "format": "ANL IRAM[0x{A:02X}], A"
+        },
+        {
             "mask": "0101'0101 AAAA'AAAA",
             "format": "ANL A, IRAM[0x{A:02X}]"
         },
@@ -278,6 +286,10 @@
         {
             "mask": "1000'0010 AAAA'AAAA",
             "format": "ANL C, BIT[0x{A:02X}]"
+        },
+        {
+            "mask": "1011'0000 AAAA'AAAA",
+            "format": "ANL C, /BIT[0x{A:02X}]"
         },
         {
             "mask": "0100'0010 AAAA'AAAA",
@@ -446,6 +458,10 @@
         {
             "mask": "1011'0010 BBBB'BBBB",
             "format": "CPL BIT[0x{B:02X}]"
+        },
+        {
+            "mask": "1010'0101",
+            "format": "INVALID"
         },
         {
             "mask": "XXXX'XXXX",
