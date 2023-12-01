@@ -1,5 +1,6 @@
 #include <disasm/spec/spec.hpp>
 
+#include <format>
 
 namespace disasm::spec {
 
@@ -19,7 +20,7 @@ namespace disasm::spec {
             }
 
             if (!found) {
-                result.emplace_back("db " + std::to_string(bytes[offset]));
+                result.emplace_back("???");
                 offset += 1;
             }
         }
