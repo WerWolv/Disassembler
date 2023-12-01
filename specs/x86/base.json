@@ -1,0 +1,17 @@
+{
+    "name": "Intel 8051",
+    "includes": [],
+    "options": [],
+    "opcodes": [
+        {
+            "mask": "1100'1100",
+            "format": "INT1"
+        }
+    ],
+    "prefixes": [
+        {
+            "mask": "1111'0000",
+            "format": "LOCK"
+        }
+    ]
+}

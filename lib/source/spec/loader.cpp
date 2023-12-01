@@ -23,6 +23,7 @@ namespace disasm::spec {
     Spec Loader::load(const std::string& string, const std::vector<std::fs::path> &includeDirectories) {
         auto json = nlohmann::json::parse(string);
 
+        std::vector<Opcode> prefixes;
         std::vector<Opcode> opcodes;
         for (const auto &includePath : json["includes"].get<std::vector<std::string>>()) {
             Spec includedSpec = load(includePath, includeDirectories);
@@ -33,7 +34,11 @@ namespace disasm::spec {
             opcodes.emplace_back(opcode["mask"], opcode["format"]);
         }
 
-        return { json["name"], opcodes };
+        for (const auto &opcode : json["prefixes"]) {
+            prefixes.emplace_back(opcode["mask"], opcode["format"]);
+        }
+
+        return { json["name"], opcodes, prefixes };
     }
 
 
