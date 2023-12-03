@@ -5,467 +5,725 @@
     "opcodes": [
         {
             "mask": "0000'0000",
-            "format": "NOP"
-        },
-        {
-            "mask": "0000'0001 AAAA'AAAA",
-            "format": "AJMP page0 #0x{A:02X}"
+            "mnemonic": "NOP",
+            "format": ""
         },
         {
             "mask": "0000'0010 AAAA'AAAA AAAA'AAAA",
-            "format": "LJMP #0x{A:04X}"
+            "mnemonic": "LJMP",
+            "format": "#0x{A:04X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1000'0000 AAAA'AAAA",
-            "format": "SJMP #0x{A:02X}"
+            "mnemonic": "SJMP",
+            "format": "#0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0111'0011",
-            "format": "JMP @A+DPTR"
+            "mnemonic": "JMP",
+            "format": "@A+DPTR"
         },
         {
             "mask": "0100'0000 AAAA'AAAA",
-            "format": "JC PC + 0x{A:02X}"
+            "mnemonic": "JC",
+            "format": "PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 2 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0011'0000 BBBB'BBBB AAAA'AAAA",
-            "format": "JNB BIT[0x{B:02X}], PC + 0x{A:02X}"
+            "mnemonic": "JNB",
+            "format": "BIT[0x{B:02X}], PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0001'0000 BBBB'BBBB AAAA'AAAA",
-            "format": "JBC BIT[0x{B:02X}], PC + 0x{A:02X}"
+            "mnemonic": "JBC",
+            "format": "BIT[0x{B:02X}], PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0010'0000 AAAA'AAAA RRRR'RRRR",
-            "format": "JB BIT[0x{A:02X}], PC + 0x{R:02X}"
+            "mnemonic": "JB",
+            "format": "BIT[0x{A:02X}], PC + 0x{R:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0001'0010 AAAA'AAAA AAAA'AAAA",
-            "format": "LCALL #0x{A:04X}"
+            "mnemonic": "LCALL",
+            "format": "#0x{A:04X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "A"
+                    }
+                }
+            ]
         },
         {
             "mask": "PPP1'0001 AAAA'AAAA",
-            "format": "ACALL page{P} #0x{A:04X}"
+            "mnemonic": "ACALL",
+            "format": "page{P} #0x{A:04X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "P * 256 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "PPP0'0001 AAAA'AAAA",
-            "format": "AJMP page{P} #0x{A:04X}"
+            "mnemonic": "AJMP",
+            "format": "page{P} #0x{A:04X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "P * 256 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0000'0011",
-            "format": "RR A"
+            "mnemonic": "RR",
+            "format": "A"
         },
         {
             "mask": "0001'0011",
-            "format": "RRC A"
+            "mnemonic": "RRC",
+            "format": "A"
         },
         {
             "mask": "0010'0011",
-            "format": "RL A"
+            "mnemonic": "RL",
+            "format": "A"
         },
         {
             "mask": "0011'0011",
-            "format": "RLC A"
+            "mnemonic": "RLC",
+            "format": "A"
         },
         {
             "mask": "0000'0100",
-            "format": "INC A"
+            "mnemonic": "INC",
+            "format": "A"
         },
         {
             "mask": "0000'0101 AAAA'AAAA",
-            "format": "INC IRAM[0x{A:02X}]"
+            "mnemonic": "INC",
+            "format": "IRAM[0x{A:02X}]"
         },
         {
-            "mask": "0000'0110",
-            "format": "INC @R0"
-        },
-        {
-            "mask": "0000'0111",
-            "format": "INC @R1"
+            "mask": "0000'011R",
+            "mnemonic": "INC",
+            "format": "@R{R}"
         },
         {
             "mask": "0000'1RRR",
-            "format": "INC R{R}"
+            "mnemonic": "INC",
+            "format": "R{R}"
         },
         {
             "mask": "1010'0011",
-            "format": "INC DPTR"
+            "mnemonic": "INC",
+            "format": "DPTR"
         },
         {
             "mask": "0001'0100",
-            "format": "DEC A"
+            "mnemonic": "DEC",
+            "format": "A"
         },
         {
             "mask": "0001'0101 AAAA'AAAA",
-            "format": "DEC IRAM[0x{A:02X}]"
+            "mnemonic": "DEC",
+            "format": "IRAM[0x{A:02X}]"
         },
         {
             "mask": "0001'0110",
-            "format": "DEC @R0"
+            "mnemonic": "DEC",
+            "format": "@R0"
         },
         {
             "mask": "0001'0111",
-            "format": "DEC @R1"
+            "mnemonic": "DEC",
+            "format": "@R1"
         },
         {
             "mask": "0001'1RRR",
-            "format": "DEC R{R}"
+            "mnemonic": "DEC",
+            "format": "R{R}"
         },
         {
             "mask": "1110'0100",
-            "format": "CLR A"
+            "mnemonic": "CLR",
+            "format": "A"
         },
         {
             "mask": "1100'0010 AAAA'AAAA",
-            "format": "CLR BIT[0x{A:02X}]"
+            "mnemonic": "CLR",
+            "format": "BIT[0x{A:02X}]"
         },
         {
             "mask": "1100'0011",
-            "format": "CLR C"
+            "mnemonic": "CLR",
+            "format": "C"
         },
         {
             "mask": "1111'0000",
-            "format": "MOVX @DPTR, A"
+            "mnemonic": "MOVX",
+            "format": "@DPTR, A"
         },
         {
             "mask": "1110'0000",
-            "format": "MOVX A, @DPTR"
+            "mnemonic": "MOVX",
+            "format": "A, @DPTR"
         },
         {
             "mask": "1111'001R",
-            "format": "MOVX @R{R}, A"
+            "mnemonic": "MOVX",
+            "format": "@R{R}, A"
         },
         {
             "mask": "1110'001R",
-            "format": "MOVX A, @R{R}"
+            "mnemonic": "MOVX",
+            "format": "A, @R{R}"
         },
         {
             "mask": "0111'011R AAAA'AAAA",
-            "format": "MOV @R{R}, #0x{A:02X}"
+            "mnemonic": "MOV",
+            "format": "@R{R}, #0x{A:02X}"
         },
         {
             "mask": "0111'1RRR AAAA'AAAA",
-            "format": "MOV R{R}, #0x{A:02X}"
+            "mnemonic": "MOV",
+            "format": "R{R}, #0x{A:02X}"
         },
         {
             "mask": "1111'1RRR",
-            "format": "MOV R{R}, A"
+            "mnemonic": "MOV",
+            "format": "R{R}, A"
         },
         {
             "mask": "1110'011R",
-            "format": "MOV A, @R{R}"
+            "mnemonic": "MOV",
+            "format": "A, @R{R}"
         },
         {
             "mask": "1111'011R",
-            "format": "MOV @R{R}, A"
+            "mnemonic": "MOV",
+            "format": "@R{R}, A"
         },
         {
             "mask": "1110'1RRR",
-            "format": "MOV A, R{R}"
+            "mnemonic": "MOV",
+            "format": "A, R{R}"
         },
         {
             "mask": "1001'0010 AAAA'AAAA",
-            "format": "MOV BIT[0x{A:02X}], C"
+            "mnemonic": "MOV",
+            "format": "BIT[0x{A:02X}], C"
         },
         {
             "mask": "1010'0010 AAAA'AAAA",
-            "format": "MOV C, BIT[0x{A:02X}]"
+            "mnemonic": "MOV",
+            "format": "C, BIT[0x{A:02X}]"
         },
         {
             "mask": "1001'0000 DDDD'DDDD DDDD'DDDD",
-            "format": "MOV DPTR, #0x{D:04X}"
+            "mnemonic": "MOV",
+            "format": "DPTR, #0x{D:04X}"
         },
         {
             "mask": "1110'0101 AAAA'AAAA",
-            "format": "MOV A, IRAM[0x{A:02X}]"
+            "mnemonic": "MOV",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "1111'0101 AAAA'AAAA",
-            "format": "MOV IRAM[#0x{A:02X}], A"
+            "mnemonic": "MOV",
+            "format": "IRAM[#0x{A:02X}], A"
         },
         {
             "mask": "0111'0101 AAAA'AAAA DDDD'DDDD",
-            "format": "MOV IRAM[0x{A:02X}], #0x{D:02X}"
+            "mnemonic": "MOV",
+            "format": "IRAM[0x{A:02X}], #0x{D:02X}"
         },
         {
             "mask": "1000'0101 AAAA'AAAA BBBB'BBBB",
-            "format": "MOV IRAM[0x{A:02X}], IRAM[0x{B:02X}]"
+            "mnemonic": "MOV",
+            "format": "IRAM[0x{A:02X}], IRAM[0x{B:02X}]"
         },
         {
             "mask": "0111'0100 DDDD'DDDD",
-            "format": "MOV A, #0x{D:02X}"
+            "mnemonic": "MOV",
+            "format": "A, #0x{D:02X}"
         },
         {
             "mask": "1000'011R AAAA'AAAA",
-            "format": "MOV IRAM[0x{A:02X}], @R{R}"
+            "mnemonic": "MOV",
+            "format": "IRAM[0x{A:02X}], @R{R}"
         },
         {
             "mask": "1000'1RRR AAAA'AAAA",
-            "format": "MOV IRAM[0x{A:02X}], R{R}"
+            "mnemonic": "MOV",
+            "format": "IRAM[0x{A:02X}], R{R}"
         },
         {
             "mask": "1010'011R AAAA'AAAA",
-            "format": "MOV @R{R}, IRAM[0x{A:02X}]"
+            "mnemonic": "MOV",
+            "format": "@R{R}, IRAM[0x{A:02X}]"
         },
         {
             "mask": "1010'1RRR AAAA'AAAA",
-            "format": "MOV R{R}, IRAM[0x{A:02X}]"
+            "mnemonic": "MOV",
+            "format": "R{R}, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0110'0000 AAAA'AAAA",
-            "format": "JZ PC + 0x{A:02X}"
+            "mnemonic": "JZ",
+            "format": "PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 2 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0111'0000 AAAA'AAAA",
-            "format": "JNZ PC + 0x{A:02X}"
+            "mnemonic": "JNZ",
+            "format": "PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 2 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1001'0011",
-            "format": "MOVC A, @A+DPTR"
+            "mnemonic": "MOVC",
+            "format": "A, @A+DPTR"
         },
         {
             "mask": "1000'0011",
-            "format": "MOVC A, @A+PC"
+            "mnemonic": "MOVC",
+            "format": "A, @A+PC"
         },
         {
             "mask": "1101'011R",
-            "format": "XCHD A, @R{R}"
+            "mnemonic": "XCHD",
+            "format": "A, @R{R}"
         },
         {
             "mask": "1100'011R",
-            "format": "XCH A, @R{R}"
+            "mnemonic": "XCH",
+            "format": "A, @R{R}"
         },
         {
             "mask": "1100'1RRR",
-            "format": "XCH A, R{R}"
+            "mnemonic": "XCH",
+            "format": "A, R{R}"
         },
         {
             "mask": "1100'0101 AAAA'AAAA",
-            "format": "XCH A, IRAM[0x{A:02X}]"
+            "mnemonic": "XCH",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0010'0010",
-            "format": "RET"
+            "mnemonic": "RET",
+            "format": ""
         },
         {
             "mask": "0011'0010",
-            "format": "RETI"
+            "mnemonic": "RETI",
+            "format": ""
         },
         {
             "mask": "1101'0010 AAAA'AAAA",
-            "format": "SETB BIT[0x{A:02X}]"
+            "mnemonic": "SETB",
+            "format": "BIT[0x{A:02X}]"
         },
         {
             "mask": "1101'0011",
-            "format": "SETB C"
+            "mnemonic": "SETB",
+            "format": "C"
         },
         {
             "mask": "0101'0010 AAAA'AAAA",
-            "format": "ANL IRAM[0x{A:02X}], A"
+            "mnemonic": "ANL",
+            "format": "IRAM[0x{A:02X}], A"
         },
         {
             "mask": "0101'0101 AAAA'AAAA",
-            "format": "ANL A, IRAM[0x{A:02X}]"
+            "mnemonic": "ANL",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0101'0011 AAAA'AAAA DDDD'DDDD",
-            "format": "ANL A, IRAM[0x{A:02X}], #0x{D:02X}"
+            "mnemonic": "ANL",
+            "format": "A, IRAM[0x{A:02X}], #0x{D:02X}"
         },
         {
             "mask": "0101'0100 AAAA'AAAA",
-            "format": "ANL A, #0x{A:02X}"
+            "mnemonic": "ANL",
+            "format": "A, #0x{A:02X}"
         },
         {
             "mask": "0101'011R",
-            "format": "ANL A, @R{R}"
+            "mnemonic": "ANL",
+            "format": "A, @R{R}"
         },
         {
             "mask": "0101'1RRR",
-            "format": "ANL A, R{R}"
+            "mnemonic": "ANL",
+            "format": "A, R{R}"
         },
         {
             "mask": "1000'0010 AAAA'AAAA",
-            "format": "ANL C, BIT[0x{A:02X}]"
+            "mnemonic": "ANL",
+            "format": "C, BIT[0x{A:02X}]"
         },
         {
             "mask": "1011'0000 AAAA'AAAA",
-            "format": "ANL C, /BIT[0x{A:02X}]"
+            "mnemonic": "ANL",
+            "format": "C, /BIT[0x{A:02X}]"
         },
         {
             "mask": "0100'0010 AAAA'AAAA",
-            "format": "ORL IRAM[0x{A:02X}], A"
+            "mnemonic": "ORL",
+            "format": "IRAM[0x{A:02X}], A"
         },
         {
             "mask": "0100'0011 AAAA'AAAA DDDD'DDDD",
-            "format": "ORL IRAM[0x{A:02X}], #0x{D:02X}"
+            "mnemonic": "ORL",
+            "format": "IRAM[0x{A:02X}], #0x{D:02X}"
         },
         {
             "mask": "0100'0100 DDDD'DDDD",
-            "format": "ORL A, #0x{D:02X}"
+            "mnemonic": "ORL",
+            "format": "A, #0x{D:02X}"
         },
         {
             "mask": "0100'011R",
-            "format": "ORL A, @R{R}"
+            "mnemonic": "ORL",
+            "format": "A, @R{R}"
         },
         {
             "mask": "0100'1RRR",
-            "format": "ORL A, R{R}"
+            "mnemonic": "ORL",
+            "format": "A, R{R}"
         },
         {
             "mask": "0100'0101 AAAA'AAAA",
-            "format": "ORL A, IRAM[0x{A:02X}]"
+            "mnemonic": "ORL",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0111'0010 AAAA'AAAA",
-            "format": "ORL C, BIT[0x{A:02X}]"
+            "mnemonic": "ORL",
+            "format": "C, BIT[0x{A:02X}]"
         },
         {
             "mask": "1010'0000 AAAA'AAAA",
-            "format": "ORL C, /BIT[0x{A:02X}]"
+            "mnemonic": "ORL",
+            "format": "C, /BIT[0x{A:02X}]"
         },
         {
             "mask": "0110'0010 AAAA'AAAA",
-            "format": "XRL IRAM[0x{A:02X}], A"
+            "mnemonic": "XRL",
+            "format": "IRAM[0x{A:02X}], A"
         },
         {
             "mask": "0110'0011 AAAA'AAAA DDDD'DDDD",
-            "format": "XRL IRAM[0x{A:02X}], #0x{D:02X}"
+            "mnemonic": "XRL",
+            "format": "IRAM[0x{A:02X}], #0x{D:02X}"
         },
         {
             "mask": "0110'0100 DDDD'DDDD",
-            "format": "XRL A, #0x{D:02X}"
+            "mnemonic": "XRL",
+            "format": "A, #0x{D:02X}"
         },
         {
             "mask": "0110'011R",
-            "format": "XRL A, @R{R}"
+            "mnemonic": "XRL",
+            "format": "A, @R{R}"
         },
         {
             "mask": "0110'1RRR",
-            "format": "XRL A, R{R}"
+            "mnemonic": "XRL",
+            "format": "A, R{R}"
         },
         {
             "mask": "0110'0101 AAAA'AAAA",
-            "format": "XRL A, IRAM[0x{A:02X}]"
+            "mnemonic": "XRL",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0010'0100 DDDD'DDDD",
-            "format": "ADD A, #0x{D:02X}"
+            "mnemonic": "ADD",
+            "format": "A, #0x{D:02X}"
         },
         {
             "mask": "0010'011R",
-            "format": "ADD A, @R{R}"
+            "mnemonic": "ADD",
+            "format": "A, @R{R}"
         },
         {
             "mask": "0010'0101 AAAA'AAAA",
-            "format": "ADD A, IRAM[0x{A:02X}]"
+            "mnemonic": "ADD",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0011'0100 DDDD'DDDD",
-            "format": "ADDC A, #0x{D:02X}"
+            "mnemonic": "ADDC",
+            "format": "A, #0x{D:02X}"
         },
         {
             "mask": "0011'011R",
-            "format": "ADDC A, @R{R}"
+            "mnemonic": "ADDC",
+            "format": "A, @R{R}"
         },
         {
             "mask": "0011'0101 AAAA'AAAA",
-            "format": "ADDC A, IRAM[0x{A:02X}]"
+            "mnemonic": "ADDC",
+            "format": "A, IRAM[0x{A:02X}]"
         },
         {
             "mask": "0011'1RRR",
-            "format": "ADD A, R{R}"
+            "mnemonic": "ADDC",
+            "format": "A, R{R}"
         },
         {
             "mask": "1001'0100 DDDD'DDDD",
-            "format": "SUBB A, #0x{D:02X}"
+            "mnemonic": "SUBB",
+            "format": "A, #0x{D:02X}"
         },
         {
             "mask": "1001'0101 IIII'IIII",
-            "format": "SUBB A, IRAM[0x{I:02X}]"
+            "mnemonic": "SUBB",
+            "format": "A, IRAM[0x{I:02X}]"
         },
         {
             "mask": "1001'011R",
-            "format": "SUBB A, @R{R}"
+            "mnemonic": "SUBB",
+            "format": "A, @R{R}"
         },
         {
             "mask": "1001'1RRR",
-            "format": "SUBB A, R{R}"
+            "mnemonic": "SUBB",
+            "format": "A, R{R}"
         },
         {
             "mask": "1010'0100",
-            "format": "MUL AB"
+            "mnemonic": "MUL",
+            "format": "AB"
         },
         {
             "mask": "1000'0100",
-            "format": "DIV AB"
+            "mnemonic": "DIV",
+            "format": "AB"
         },
         {
             "mask": "0010'1RRR",
-            "format": "ORL A, R{R}"
+            "mnemonic": "ORL",
+            "format": "A, R{R}"
         },
         {
             "mask": "1011'0101 IIII'IIII AAAA'AAAA",
-            "format": "CJNE A, IRAM[0x{I:02X}], PC + 0x{A:02X}"
+            "mnemonic": "CJNE",
+            "format": "A, IRAM[0x{I:02X}], PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1011'0100 DDDD'DDDD AAAA'AAAA",
-            "format": "CJNE A, #0x{D:02X}, PC + 0x{A:02X}"
+            "mnemonic": "CJNE",
+            "format": "A, #0x{D:02X}, PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1011'011R DDDD'DDDD AAAA'AAAA",
-            "format": "CJNE @R{R}, #0x{D:02X}, PC + 0x{A:02X}"
+            "mnemonic": "CJNE",
+            "format": "@R{R}, #0x{D:02X}, PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1011'1RRR DDDD'DDDD AAAA'AAAA",
-            "format": "CJNE R{R}, #0x{D:02X}, PC + 0x{A:02X}"
+            "mnemonic": "CJNE",
+            "format": "R{R}, #0x{D:02X}, PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1101'0101 IIII'IIII AAAA'AAAA",
-            "format": "DJNZ IRAM[0x{I:02X}], PC + 0x{A:02X}"
+            "mnemonic": "DJNZ",
+            "format": "IRAM[0x{I:02X}], PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 3 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1101'1RRR AAAA'AAAA",
-            "format": "DJNZ R{R}, PC + 0x{R:02X}"
+            "mnemonic": "DJNZ",
+            "format": "R{R}, PC + 0x{R:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 2 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "0101'0000 AAAA'AAAA",
-            "format": "JNC PC + 0x{A:02X}"
+            "mnemonic": "JNC",
+            "format": "PC + 0x{A:02X}",
+            "metadata": [
+                {
+                    "type": "jump",
+                    "data": {
+                        "destination": "offset + 2 + A"
+                    }
+                }
+            ]
         },
         {
             "mask": "1101'0000 AAAA'AAAA",
-            "format": "POP IRAM[0x{A:02X}]"
+            "mnemonic": "POP",
+            "format": "IRAM[0x{A:02X}]"
         },
         {
             "mask": "1100'0000 AAAA'AAAA",
-            "format": "PUSH IRAM[0x{A:02X}]"
+            "mnemonic": "PUSH",
+            "format": "IRAM[0x{A:02X}]"
         },
         {
             "mask": "1101'0100",
-            "format": "DA"
+            "mnemonic": "DA",
+            "format": ""
         },
         {
             "mask": "1100'0100",
-            "format": "SWAP A"
+            "mnemonic": "SWAP",
+            "format": "A"
         },
         {
             "mask": "1111'0100",
-            "format": "CPL A"
+            "mnemonic": "CPL",
+            "format": "A"
         },
         {
             "mask": "1011'0011",
-            "format": "CPL C"
+            "mnemonic": "CPL",
+            "format": "C"
         },
         {
             "mask": "1011'0010 BBBB'BBBB",
-            "format": "CPL BIT[0x{B:02X}]"
+            "mnemonic": "CPL",
+            "format": "BIT[0x{B:02X}]"
         },
         {
             "mask": "1010'0101",
-            "format": "INVALID"
+            "mnemonic": "INVALID",
+            "format": ""
         },
         {
             "mask": "XXXX'XXXX",
-            "format": "????? DB #0x{X:02X}"
+            "mnemonic": "DB",
+            "format": "#0x{X:02X}",
+            "metadata": [
+                {
+                    "type": "data",
+                    "data": {
+                        "value": "X"
+                    }
+                }
+            ]
         }
 
     ]

@@ -8,11 +8,26 @@
 
 namespace disasm::spec {
 
-    Opcode::Opcode(std::string mask, std::string format)
-        : m_format(std::move(format)),
+    Opcode::Opcode(std::string mnemonic, std::string mask, std::string format, nlohmann::json metadata)
+        : m_mnemonic(std::move(mnemonic)),
+          m_format(std::move(format)),
+          m_metadata(std::move(metadata)),
           m_bitPattern(std::move(mask)) { }
 
-    std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, const std::span<const u8> bytes) const {
+    std::optional<i128> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes) const {
+        wolv::math_eval::MathEvaluator<i128> mathEvaluator;
+
+        mathEvaluator.setVariable("offset", address);
+        for (const auto &placeholder : this->m_bitPattern.getPlaceholders()) {
+            mathEvaluator.setVariable(std::string(1, placeholder), this->m_bitPattern.valueOf(placeholder, bytes));
+        }
+
+        const auto result = mathEvaluator.evaluate(expression);
+
+        return result;
+    }
+
+    std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, u64 address, const std::span<const u8> bytes) const {
         std::string formatString;
         i128 value = 0;
 
@@ -22,13 +37,7 @@ namespace disasm::spec {
             if (parts.size() != 2)
                 return std::nullopt;
 
-            wolv::math_eval::MathEvaluator<i128> mathEvaluator;
-
-            for (const auto &placeholder : this->m_bitPattern.getPlaceholders()) {
-                mathEvaluator.setVariable(std::string(1, placeholder), this->m_bitPattern.valueOf(placeholder, bytes));
-            }
-
-            const auto result = mathEvaluator.evaluate(parts[0]);
+            const auto result = this->evaluateExpression(parts[0], address, bytes);
             if (!result.has_value())
                 return std::nullopt;
 
@@ -44,8 +53,7 @@ namespace disasm::spec {
         return std::vformat(formatString, std::make_format_args(value));
     }
 
-
-    std::optional<std::string> Opcode::format(const std::span<const u8> bytes) const {
+    std::optional<std::string> Opcode::format(u64 address, const std::span<const u8> bytes) const {
         if (!this->m_bitPattern.matches(bytes))
             return std::nullopt;
 
@@ -69,7 +77,7 @@ namespace disasm::spec {
                         return std::nullopt;
                 }
 
-                if (auto formattedValue = evaluateFormatSpecifier(formatSpecifier, bytes); formattedValue.has_value()) {
+                if (auto formattedValue = evaluateFormatSpecifier(formatSpecifier, address, bytes); formattedValue.has_value()) {
                     result += formattedValue.value();
                 } else {
                     return std::nullopt;

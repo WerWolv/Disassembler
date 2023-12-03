@@ -31,17 +31,15 @@ namespace disasm::spec {
         }
 
         for (const auto &opcode : json["opcodes"]) {
-            opcodes.emplace_back(opcode["mask"], opcode["format"]);
+            opcodes.emplace_back(opcode["mnemonic"], opcode["mask"], opcode["format"], opcode.contains("metadata") ? opcode["metadata"] : nlohmann::json());
         }
 
         for (const auto &opcode : json["prefixes"]) {
-            prefixes.emplace_back(opcode["mask"], opcode["format"]);
+            prefixes.emplace_back(opcode["mnemonic"], opcode["mask"], opcode["format"], opcode.contains("metadata") ? opcode["metadata"] : nlohmann::json());
         }
 
         return { json["name"], opcodes, prefixes };
     }
-
-
 
 }
 

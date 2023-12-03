@@ -3,9 +3,11 @@
 #include <format>
 
 int main() {
+    using namespace disasm;
+
     const auto loadPath = wolv::io::fs::getExecutablePath()->parent_path() / ".." / ".." / "specs";
 
-    const disasm::spec::Spec spec = disasm::spec::Loader::load(
+    spec::Spec spec = spec::Loader::load(
         std::fs::path("8051/base.json"),
         {loadPath }
     );
@@ -17,7 +19,7 @@ int main() {
     const auto result = spec.disassemble(bytes);
 
     std::setbuf(stdout, nullptr);
-    for (const auto &line : result) {
-        std::printf("%s\n", line.c_str());
+    for (const auto &disassembly : result) {
+        std::printf("%s %s\n", disassembly.mnemonic.c_str(), disassembly.operands.c_str());
     }
 }
