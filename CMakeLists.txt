@@ -13,6 +13,10 @@ if (NOT TARGET wolv::types)
     add_subdirectory(external/libwolv)
 endif()
 
+if (NOT TARGET fmt::fmt)
+    add_subdirectory(external/fmt)
+endif()
+
 add_subdirectory(lib)
 
 if (DISASSEMBLER_ENABLE_TESTS)

@@ -6,6 +6,8 @@
 #include <wolv/utils/string.hpp>
 #include <wolv/math_eval/math_evaluator.hpp>
 
+#include <fmt/core.h>
+
 namespace disasm::spec {
 
     Opcode::Opcode(std::string mnemonic, std::string mask, std::string format, nlohmann::json metadata)
@@ -41,7 +43,7 @@ namespace disasm::spec {
             if (!result.has_value())
                 return std::nullopt;
 
-            formatString = std::format("{{0:{}}}", parts[1]);
+            formatString = fmt::format("{{0:{}}}", parts[1]);
             value = result.value();
         } else if (delimiterCount > 1) {
             return std::nullopt;
@@ -50,7 +52,7 @@ namespace disasm::spec {
             value = m_bitPattern.valueOf(formatSpecifier[0], bytes);
         }
 
-        return std::vformat(formatString, std::make_format_args(value));
+        return fmt::vformat(formatString, fmt::make_format_args(value));
     }
 
     std::optional<std::string> Opcode::format(u64 address, const std::span<const u8> bytes) const {
