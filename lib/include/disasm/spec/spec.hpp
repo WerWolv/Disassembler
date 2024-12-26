@@ -14,6 +14,7 @@ namespace disasm::spec {
     struct Disassembly {
         std::string mnemonic;
         std::string operands;
+        std::span<const u8> bytes;
         std::vector<nlohmann::json> metadata;
     };
 
@@ -28,7 +29,7 @@ namespace disasm::spec {
         [[nodiscard]] const std::vector<Opcode>& getOpcodes() const noexcept { return m_opcodes; }
         [[nodiscard]] const std::vector<Opcode>& getPrefixes() const noexcept { return m_prefixes; }
 
-        [[nodiscard]] std::vector<Disassembly> disassemble(std::span<const u8> bytes) const;
+        [[nodiscard]] std::vector<Disassembly> disassemble(std::span<const u8> bytes, std::size_t instructionCount = 0) const;
 
     private:
         std::string m_name;

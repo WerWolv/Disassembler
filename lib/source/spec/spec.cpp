@@ -35,12 +35,15 @@ namespace disasm::spec {
                 }
             }
 
+            if (!mnemonic.empty()) mnemonic.pop_back();
+            if (!operands.empty()) operands.pop_back();
+
             return { mnemonic, operands, foundOpcode, advance };
         }
 
     }
 
-    std::vector<Disassembly> Spec::disassemble(const std::span<const u8> bytes) const {
+    std::vector<Disassembly> Spec::disassemble(std::span<const u8> bytes, std::size_t instructionCount) const {
         std::vector<Disassembly> disassembly;
 
         size_t offset = 0x00;
@@ -74,10 +77,13 @@ namespace disasm::spec {
                         }
                     }
 
-                    disassembly.emplace_back(std::move(mnemonic), std::move(operands), std::move(metadata));
+                    disassembly.emplace_back(std::move(mnemonic), std::move(operands), bytes.subspan(offset, result.advance), std::move(metadata));
                 }
             }
 
+            if (instructionCount != 0 && disassembly.size() >= instructionCount) {
+                break;
+            }
         }
 
         return disassembly;
