@@ -21,7 +21,7 @@ namespace disasm::spec {
 
     BitPattern::BitPattern(std::string mask) : m_mask(std::move(mask)) {
         for (char c : m_mask) {
-            if (isMaskCharacter(c) && !std::ranges::contains(m_placeholders, c))
+            if (isMaskCharacter(c) && std::find(m_placeholders.begin(), m_placeholders.end(), c) == m_placeholders.end())
                 m_placeholders.push_back(c);
         }
     }
