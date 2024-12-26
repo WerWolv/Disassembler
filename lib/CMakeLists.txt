@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 project(libdisassembler)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -11,5 +11,5 @@ add_library(libdisassembler STATIC
 )
 
 target_include_directories(libdisassembler PUBLIC include)
-target_link_libraries(libdisassembler PUBLIC nlohmann_json wolv::types wolv::utils wolv::io wolv::math_eval)
-target_compile_options(libdisassembler PUBLIC -Wall -Wextra -Wpedantic -Werror)
+target_link_libraries(libdisassembler PRIVATE nlohmann_json wolv::types wolv::utils wolv::io wolv::math_eval)
+target_compile_options(libdisassembler PRIVATE -Wall -Wextra -Wpedantic -Werror)

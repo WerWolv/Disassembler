@@ -1,12 +1,21 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 project(Disassembler)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_subdirectory(external/json)
-add_subdirectory(external/libwolv)
+option(DISASSEMBLER_ENABLE_TESTS "Enable disassembler tests" OFF)
+
+if (NOT TARGET nlohmann_json::nlohmann_json)
+    add_subdirectory(external/json)
+endif()
+
+if (NOT TARGET wolv::types)
+    add_subdirectory(external/libwolv)
+endif()
 
 add_subdirectory(lib)
 
-enable_testing()
-add_subdirectory(tests)
+if (DISASSEMBLER_ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
