@@ -11,5 +11,5 @@ add_library(libdisassembler STATIC
 )
 
 target_include_directories(libdisassembler PUBLIC include)
-target_link_libraries(libdisassembler PRIVATE nlohmann_json wolv::types wolv::utils wolv::io wolv::math_eval fmt-header-only)
+target_link_libraries(libdisassembler PRIVATE wolv::types wolv::utils wolv::io wolv::math_eval ${NLOHMANN_JSON_LIBRARIES} ${FMT_LIBRARIES})
 target_compile_options(libdisassembler PRIVATE -Wall -Wextra -Wpedantic -Werror)
