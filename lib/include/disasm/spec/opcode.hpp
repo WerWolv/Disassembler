@@ -19,7 +19,7 @@ namespace disasm::spec {
 
         [[nodiscard]] const nlohmann::json& getMetadata() const noexcept { return m_metadata; }
 
-        [[nodiscard]] std::optional<i128> evaluateExpression(const std::string &expression, u64 address, std::span<const u8> bytes) const;
+        [[nodiscard]] std::optional<i64> evaluateExpression(const std::string &expression, u64 address, std::span<const u8> bytes) const;
 
     private:
         [[nodiscard]] std::optional<std::string> evaluateFormatSpecifier(std::string_view formatSpecifier, u64 address, std::span<const u8> bytes) const;

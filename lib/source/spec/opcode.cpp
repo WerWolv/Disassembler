@@ -16,8 +16,8 @@ namespace disasm::spec {
           m_metadata(std::move(metadata)),
           m_bitPattern(std::move(mask)) { }
 
-    std::optional<i128> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes) const {
-        wolv::math_eval::MathEvaluator<i128> mathEvaluator;
+    std::optional<i64> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes) const {
+        wolv::math_eval::MathEvaluator<i64> mathEvaluator;
 
         mathEvaluator.setVariable("offset", address);
         for (const auto &placeholder : this->m_bitPattern.getPlaceholders()) {
@@ -31,7 +31,7 @@ namespace disasm::spec {
 
     std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, u64 address, const std::span<const u8> bytes) const {
         std::string formatString;
-        i128 value = 0;
+        i64 value = 0;
 
         const auto delimiterCount = std::ranges::count(formatSpecifier, ':');
         if (delimiterCount == 1) {
