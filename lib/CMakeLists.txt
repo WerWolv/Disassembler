@@ -12,4 +12,7 @@ add_library(libdisassembler STATIC
 
 target_include_directories(libdisassembler PUBLIC include)
 target_link_libraries(libdisassembler PRIVATE wolv::types wolv::utils wolv::io wolv::math_eval ${NLOHMANN_JSON_LIBRARIES} ${FMT_LIBRARIES})
-target_compile_options(libdisassembler PRIVATE -Wall -Wextra -Wpedantic -Werror)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(libdisassembler PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
