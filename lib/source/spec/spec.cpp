@@ -1,7 +1,5 @@
 #include <disasm/spec/spec.hpp>
 
-#include <format>
-
 namespace disasm::spec {
 
     namespace {
