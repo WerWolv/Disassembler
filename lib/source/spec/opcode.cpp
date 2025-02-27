@@ -1,4 +1,3 @@
-#include <format>
 #include <algorithm>
 #include <ranges>
 #include <disasm/spec/opcode.hpp>

@@ -1,7 +1,5 @@
 #include <disasm/disasm.hpp>
 
-#include <format>
-
 int main() {
     using namespace disasm;
 
