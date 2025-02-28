@@ -20,6 +20,7 @@ namespace disasm::spec {
 
     class Spec {
     public:
+        Spec() = default;
         Spec(std::string name, std::vector<Opcode> opcodes, std::vector<Opcode> prefixes)
             : m_name(std::move(name)),
               m_opcodes(std::move(opcodes)),
