@@ -75,7 +75,7 @@ namespace disasm::spec {
                         }
                     }
 
-                    disassembly.emplace_back(std::move(mnemonic), std::move(operands), bytes.subspan(offset, result.advance), std::move(metadata));
+                    disassembly.emplace_back(std::move(mnemonic), std::move(operands), bytes.subspan(offset - result.advance, result.advance), std::move(metadata));
                 }
             }
 
