@@ -28,7 +28,35 @@ namespace disasm::spec {
         return result;
     }
 
-    std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, u64 address, const std::span<const u8> bytes) const {
+    std::optional<std::string> Opcode::evaluateLUTFormatSpecifier(std::string_view formatSpecifier, const std::map<std::string, std::vector<std::string> > &tables, std::span<const u8> bytes) const {
+        std::string_view tableName;
+        std::string_view specifier;
+
+        auto specifierStart = formatSpecifier.find_first_of('[');
+        auto specifierEnd = formatSpecifier.find_first_of(']');
+        if (specifierStart == std::string_view::npos || specifierEnd == std::string_view::npos)
+            return std::nullopt;
+        if (specifierStart >= specifierEnd)
+            return std::nullopt;
+
+        tableName = formatSpecifier.substr(0, specifierStart);
+        specifier = formatSpecifier.substr(specifierStart + 1, specifierEnd - specifierStart - 1);
+        if (specifier.size() != 1 || tableName.empty())
+            return std::nullopt;
+
+        const auto value = m_bitPattern.valueOf(specifier[0], bytes);
+
+        const auto tableIt = tables.find(std::string(tableName));
+        if (tableIt == tables.end())
+            return std::nullopt;
+
+        if (value >= tableIt->second.size())
+            return std::nullopt;
+
+        return tableIt->second[value];
+    }
+
+    std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, const std::map<std::string, std::vector<std::string>> &tables, u64 address, const std::span<const u8> bytes) const {
         std::string formatString;
         i64 value = 0;
 
@@ -47,14 +75,21 @@ namespace disasm::spec {
         } else if (delimiterCount > 1) {
             return std::nullopt;
         } else {
-            formatString = "{}";
-            value = m_bitPattern.valueOf(formatSpecifier[0], bytes);
+            if (formatSpecifier.contains('[')) {
+                auto result = evaluateLUTFormatSpecifier(formatSpecifier, tables, bytes);
+                if (!result.has_value())
+                    return std::nullopt;
+                formatString = result.value();
+            } else {
+                formatString = "{}";
+                value = m_bitPattern.valueOf(formatSpecifier[0], bytes);
+            }
         }
 
         return fmt::vformat(formatString, fmt::make_format_args(value));
     }
 
-    std::optional<std::string> Opcode::format(u64 address, const std::span<const u8> bytes) const {
+    std::optional<std::string> Opcode::format(u64 address, const std::span<const u8> bytes, const std::map<std::string, std::vector<std::string>> &tables) const {
         if (!this->m_bitPattern.matches(bytes))
             return std::nullopt;
 
@@ -78,7 +113,7 @@ namespace disasm::spec {
                         return std::nullopt;
                 }
 
-                if (auto formattedValue = evaluateFormatSpecifier(formatSpecifier, address, bytes); formattedValue.has_value()) {
+                if (auto formattedValue = evaluateFormatSpecifier(formatSpecifier, tables, address, bytes); formattedValue.has_value()) {
                     result += formattedValue.value();
                 } else {
                     return std::nullopt;

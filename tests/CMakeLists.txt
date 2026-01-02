@@ -8,4 +8,4 @@ add_executable(disassembler_tests
 )
 
 target_include_directories(disassembler_tests PUBLIC include)
-target_link_libraries(disassembler_tests PUBLIC libdisassembler)
+target_link_libraries(disassembler_tests PUBLIC libdisassembler wolv::types wolv::io wolv::math_eval nlohmann_json::nlohmann_json)

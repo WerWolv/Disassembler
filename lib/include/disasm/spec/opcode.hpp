@@ -14,7 +14,7 @@ namespace disasm::spec {
         Opcode(std::string mnemonic, std::string mask, std::string format, nlohmann::json metadata);
 
         [[nodiscard]] const std::string& getMnemonic() const { return this->m_mnemonic; }
-        [[nodiscard]] std::optional<std::string> format(u64 address, std::span<const u8> bytes) const;
+        [[nodiscard]] std::optional<std::string> format(u64 address, std::span<const u8> bytes, const std::map<std::string, std::vector<std::string>> &tables) const;
         [[nodiscard]] u32 getSize() const noexcept { return m_bitPattern.getSize(); }
 
         [[nodiscard]] const nlohmann::json& getMetadata() const noexcept { return m_metadata; }
@@ -22,7 +22,8 @@ namespace disasm::spec {
         [[nodiscard]] std::optional<i64> evaluateExpression(const std::string &expression, u64 address, std::span<const u8> bytes) const;
 
     private:
-        [[nodiscard]] std::optional<std::string> evaluateFormatSpecifier(std::string_view formatSpecifier, u64 address, std::span<const u8> bytes) const;
+        [[nodiscard]] std::optional<std::string> evaluateFormatSpecifier(std::string_view formatSpecifier, const std::map<std::string, std::vector<std::string>> &tables, u64 address, std::span<const u8> bytes) const;
+        [[nodiscard]] std::optional<std::string> evaluateLUTFormatSpecifier(std::string_view formatSpecifier, const std::map<std::string, std::vector<std::string>> &tables, std::span<const u8> bytes) const;
 
     private:
         std::string m_mnemonic;
