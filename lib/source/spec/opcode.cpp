@@ -5,7 +5,7 @@
 #include <wolv/utils/string.hpp>
 #include <wolv/math_eval/math_evaluator.hpp>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace disasm::spec {
 
