@@ -15,6 +15,38 @@ namespace disasm::spec {
           m_metadata(std::move(metadata)),
           m_bitPattern(std::move(mask)) { }
 
+    namespace {
+
+        template<std::endian Endian>
+        std::optional<i64> changeEndiannessFunction(std::vector<i64> args) {
+            const auto value = args[0];
+            auto size = args[1];
+
+            if constexpr (Endian == std::endian::native)
+                return value;
+
+            size = std::min<size_t>(size, sizeof(i64));
+
+            std::array<uint8_t, sizeof(i64)> data = { };
+            std::memcpy(data.data(), &value, size);
+
+            for (uint32_t i = 0; i < size / 2; i++) {
+                std::swap(data[i], data[size - 1 - i]);
+            }
+
+            i64 result = { };
+            std::memcpy(&result, data.data(), size);
+
+            return result;
+        }
+
+        void registerFunctions(wolv::math_eval::MathEvaluator<i64> &mathEvaluator) {
+            mathEvaluator.setFunction("le", changeEndiannessFunction<std::endian::little>, 2, 2);
+            mathEvaluator.setFunction("be", changeEndiannessFunction<std::endian::big>, 2, 2);
+        }
+
+    }
+
     std::optional<i64> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes) const {
         wolv::math_eval::MathEvaluator<i64> mathEvaluator;
 
@@ -22,6 +54,8 @@ namespace disasm::spec {
         for (const auto &placeholder : this->m_bitPattern.getPlaceholders()) {
             mathEvaluator.setVariable(std::string(1, placeholder), this->m_bitPattern.valueOf(placeholder, bytes));
         }
+        registerFunctions(mathEvaluator);
+
 
         const auto result = mathEvaluator.evaluate(expression);
 
