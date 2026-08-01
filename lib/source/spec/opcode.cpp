@@ -18,7 +18,7 @@ namespace disasm::spec {
     namespace {
 
         template<std::endian Endian>
-        std::optional<i64> changeEndiannessFunction(std::vector<i64> args) {
+        std::optional<i64> changeEndiannessFunction(const std::vector<i64> &args) {
             const auto value = args[0];
             auto size = args[1];
 
@@ -43,6 +43,14 @@ namespace disasm::spec {
         void registerFunctions(wolv::math_eval::MathEvaluator<i64> &mathEvaluator) {
             mathEvaluator.setFunction("le", changeEndiannessFunction<std::endian::little>, 2, 2);
             mathEvaluator.setFunction("be", changeEndiannessFunction<std::endian::big>, 2, 2);
+            mathEvaluator.setFunction("asEndian", [](std::vector<i64> args) {
+                const auto func =
+                    args[0] == 0 ?
+                    changeEndiannessFunction<std::endian::little> :
+                    changeEndiannessFunction<std::endian::big>;
+
+                return func({ args[1], args[2] });
+            }, 3, 3);
         }
 
     }
