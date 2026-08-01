@@ -46,6 +46,52 @@ namespace disasm::spec {
                 }
             }
 
+            std::vector<std::unique_ptr<Setting>> settings;
+            if (json.contains("settings") && json["settings"].is_array()) {
+                for (const auto &entry : json["settings"].items()) {
+                    const auto &setting = entry.value();
+
+                    const auto type = setting["type"].get<std::string>();
+
+                    if (type == "bool") {
+                        auto newSetting = std::make_unique<SettingBool>();
+                        settings.emplace_back(std::move(newSetting));
+                    } else if (type == "int") {
+                        auto newSetting = std::make_unique<SettingInt>();
+                        newSetting->min = setting["min"].get<i64>();
+                        newSetting->max = setting["max"].get<i64>();
+
+                        const auto radix = setting.contains("radix") ? setting["radix"].get<std::string>() : "dec";
+                        if (radix == "hex") {
+                            newSetting->radix = SettingInt::Radix::Hexadecimal;
+                        } else if (radix == "dec") {
+                            newSetting->radix = SettingInt::Radix::Decimal;
+                        } else {
+                            throw std::runtime_error(fmt::format("Unknown radix type: {}", radix));
+                        }
+
+                        settings.emplace_back(std::move(newSetting));
+                    } else if (type == "enum") {
+                        auto newSetting = std::make_unique<SettingEnum>();
+
+                        for (const auto &value : setting["values"]) {
+                            SettingEnum::Value enumValue;
+                            enumValue.name = value["name"].get<std::string>();
+                            enumValue.value = value["value"].get<i64>();
+                            newSetting->values.emplace_back(std::move(enumValue));
+                        }
+
+                        settings.emplace_back(std::move(newSetting));
+                    } else {
+                        throw std::runtime_error(fmt::format("Unknown setting type: {}", type));
+                    }
+
+                    auto &newSetting = settings.back();
+                    newSetting->name = setting["name"].get<std::string>();
+                    newSetting->displayName = setting["displayName"].get<std::string>();
+                }
+            }
+
             for (const auto &opcode : json["opcodes"]) {
                 opcodes.emplace_back(opcode["mnemonic"], opcode["mask"], opcode["format"], opcode.contains("metadata") ? opcode["metadata"] : nlohmann::json());
             }
@@ -55,12 +101,13 @@ namespace disasm::spec {
             }
 
             return Spec {
-                json["name"],
+                json["name"].get<std::string>(),
                 std::move(opcodes),
                 std::move(prefixes),
-                std::move(tables)
+                std::move(tables),
+                std::move(settings)
             };
-        } catch (const nlohmann::json::exception &e) {
+        } catch (const std::exception &e) {
             throw std::runtime_error(fmt::format("Error while parsing file: {}", e.what()));
         }
     }

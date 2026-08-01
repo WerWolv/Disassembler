@@ -11,13 +11,13 @@ namespace disasm::spec {
             size_t advance;
         };
 
-        FormatResult formatOpcode(const std::vector<Opcode> &opcodes, const std::map<std::string, std::vector<std::string>> &tables, u64 address, std::span<const u8> bytes, bool allowMultiple = false) {
+        FormatResult formatOpcode(const std::vector<Opcode> &opcodes, const std::map<std::string, std::vector<std::string>> &tables, u64 address, std::span<const u8> bytes, const std::map<std::string, i64> &variables, bool allowMultiple = false) {
             std::string mnemonic, operands;
             size_t advance = 0;
 
             const Opcode *foundOpcode = nullptr;
             for (const Opcode &opcode : opcodes) {
-                if (auto formattedValue = opcode.format(address, bytes.subspan(advance), tables); formattedValue.has_value()) {
+                if (auto formattedValue = opcode.format(address, bytes.subspan(advance), tables, variables); formattedValue.has_value()) {
                     mnemonic += opcode.getMnemonic();
                     mnemonic.append(" ");
 
@@ -41,7 +41,7 @@ namespace disasm::spec {
 
     }
 
-    std::vector<Disassembly> Spec::disassemble(std::span<const u8> bytes, std::size_t instructionCount) const {
+    std::vector<Disassembly> Spec::disassemble(std::span<const u8> bytes, std::size_t instructionCount, const std::map<std::string, i64> &variables) const {
         std::vector<Disassembly> disassembly;
 
         size_t offset = 0x00;
@@ -49,14 +49,14 @@ namespace disasm::spec {
             std::string mnemonic, operands;
 
             {
-                const auto result = formatOpcode(getPrefixes(), getTables(), offset, bytes.subspan(offset), true);
+                const auto result = formatOpcode(getPrefixes(), getTables(), offset, bytes.subspan(offset), variables, true);
                 mnemonic += result.mnemonic;
                 operands += result.operands;
                 offset += result.advance;
             }
 
             {
-                const auto result = formatOpcode(getOpcodes(), getTables(), offset, bytes.subspan(offset));
+                const auto result = formatOpcode(getOpcodes(), getTables(), offset, bytes.subspan(offset), variables);
                 mnemonic += result.mnemonic;
                 operands += result.operands;
                 offset += result.advance;
@@ -74,6 +74,10 @@ namespace disasm::spec {
                                 metadata.push_back(entry);
                             }
                         }
+                    }
+
+                    if (offset + result.advance > bytes.size()) {
+                        break;
                     }
 
                     disassembly.emplace_back(std::move(mnemonic), std::move(operands), bytes.subspan(offset - result.advance, result.advance), std::move(metadata));

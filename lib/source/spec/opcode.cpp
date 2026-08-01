@@ -47,12 +47,15 @@ namespace disasm::spec {
 
     }
 
-    std::optional<i64> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes) const {
+    std::optional<i64> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes, const std::map<std::string, i64> &variables) const {
         wolv::math_eval::MathEvaluator<i64> mathEvaluator;
 
         mathEvaluator.setVariable("offset", address);
         for (const auto &placeholder : this->m_bitPattern.getPlaceholders()) {
             mathEvaluator.setVariable(std::string(1, placeholder), this->m_bitPattern.valueOf(placeholder, bytes));
+        }
+        for (const auto &variable : variables) {
+            mathEvaluator.setVariable(variable.first, variable.second);
         }
         registerFunctions(mathEvaluator);
 
@@ -90,7 +93,7 @@ namespace disasm::spec {
         return tableIt->second[value];
     }
 
-    std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, const std::map<std::string, std::vector<std::string>> &tables, u64 address, const std::span<const u8> bytes) const {
+    std::optional<std::string> Opcode::evaluateFormatSpecifier(std::string_view formatSpecifier, const std::map<std::string, std::vector<std::string>> &tables, const std::map<std::string, i64> &variables, u64 address, const std::span<const u8> bytes) const {
         std::string formatString;
         i64 value = 0;
 
@@ -100,7 +103,7 @@ namespace disasm::spec {
             if (parts.size() != 2)
                 return std::nullopt;
 
-            const auto result = this->evaluateExpression(parts[0], address, bytes);
+            const auto result = this->evaluateExpression(parts[0], address, bytes, variables);
             if (!result.has_value())
                 return std::nullopt;
 
@@ -123,7 +126,7 @@ namespace disasm::spec {
         return fmt::vformat(formatString, fmt::make_format_args(value));
     }
 
-    std::optional<std::string> Opcode::format(u64 address, const std::span<const u8> bytes, const std::map<std::string, std::vector<std::string>> &tables) const {
+    std::optional<std::string> Opcode::format(u64 address, const std::span<const u8> bytes, const std::map<std::string, std::vector<std::string>> &tables, const std::map<std::string, i64> &variables) const {
         if (!this->m_bitPattern.matches(bytes))
             return std::nullopt;
 
@@ -147,7 +150,7 @@ namespace disasm::spec {
                         return std::nullopt;
                 }
 
-                if (auto formattedValue = evaluateFormatSpecifier(formatSpecifier, tables, address, bytes); formattedValue.has_value()) {
+                if (auto formattedValue = evaluateFormatSpecifier(formatSpecifier, tables, variables, address, bytes); formattedValue.has_value()) {
                     result += formattedValue.value();
                 } else {
                     return std::nullopt;

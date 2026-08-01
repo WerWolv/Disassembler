@@ -54,6 +54,9 @@ namespace disasm::spec {
 
         u32 bitOffset = 0;
         for (size_t maskOffset = 0; maskOffset < m_mask.size(); maskOffset += 1) {
+            if (bitOffset / 8 >= bytes.size_bytes())
+                break;
+
             const char c = m_mask[maskOffset];
             if (c == placeholder) {
                 result <<= 1;
