@@ -27,6 +27,9 @@ namespace disasm::spec {
     }
 
     bool BitPattern::matches(const std::span<const u8> bytes) const {
+        if (bytes.size() < getSize())
+            return false;
+
         u32 bitOffset = 0;
         for (size_t maskOffset = 0; maskOffset < m_mask.size(); maskOffset += 1) {
             const char c = m_mask[maskOffset];
