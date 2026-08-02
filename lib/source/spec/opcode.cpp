@@ -9,9 +9,10 @@
 
 namespace disasm::spec {
 
-    Opcode::Opcode(std::string mnemonic, std::string mask, std::string format, nlohmann::json metadata)
+    Opcode::Opcode(std::string mnemonic, std::string mask, std::string format, std::string sizeof_spec, nlohmann::json metadata)
         : m_mnemonic(std::move(mnemonic)),
           m_format(std::move(format)),
+          m_sizeof(std::move(sizeof_spec)),
           m_metadata(std::move(metadata)),
           m_bitPattern(std::move(mask)) { }
 
@@ -53,6 +54,15 @@ namespace disasm::spec {
             }, 3, 3);
         }
 
+    }
+
+    u32 Opcode::getSize(const u64 address, const std::span<const u8> bytes, const std::map<std::string, i64> &variables) const noexcept {
+        const auto size = m_bitPattern.getSize();
+        if (m_sizeof.empty()) {
+            return size;
+        }
+
+        return size + evaluateExpression(m_sizeof, address, bytes, variables).value_or(0);
     }
 
     std::optional<i64> Opcode::evaluateExpression(const std::string &expression, u64 address, const std::span<const u8> bytes, const std::map<std::string, i64> &variables) const {

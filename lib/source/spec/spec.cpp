@@ -17,14 +17,15 @@ namespace disasm::spec {
 
             const Opcode *foundOpcode = nullptr;
             for (const Opcode &opcode : opcodes) {
-                if (auto formattedValue = opcode.format(address, bytes.subspan(advance), tables, variables); formattedValue.has_value()) {
+                const auto bytes_span = bytes.subspan(advance);
+                if (auto formattedValue = opcode.format(address, bytes_span, tables, variables); formattedValue.has_value()) {
                     mnemonic += opcode.getMnemonic();
                     mnemonic.append(" ");
 
                     operands += formattedValue.value();
                     operands.append(" ");
 
-                    advance += opcode.getSize();
+                    advance += opcode.getSize(address, bytes_span, variables);
 
                     foundOpcode = &opcode;
 
