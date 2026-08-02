@@ -29,6 +29,7 @@ namespace disasm::spec {
                 json["mask"],
                 json["format"],
                 json.contains("sizeof") ? json["sizeof"] : "",
+                json.contains("if") ? json["if"] : "",
                 json.contains("metadata") ? json["metadata"] : nlohmann::json()
             };
         }
