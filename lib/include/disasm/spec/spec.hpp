@@ -71,12 +71,18 @@ namespace disasm::spec {
     class Spec {
     public:
         Spec() = default;
-        Spec(std::string name, std::vector<Opcode> opcodes, std::vector<Opcode> prefixes, std::map<std::string, std::vector<std::string>> tables, std::vector<std::unique_ptr<Setting>> settings)
+        Spec(std::string name, std::vector<Opcode> opcodes, std::vector<Opcode> prefixes, std::map<std::string, std::vector<std::string>> tables, std::vector<std::unique_ptr<Setting>> &&settings)
             : m_name(std::move(name)),
               m_opcodes(std::move(opcodes)),
               m_prefixes(std::move(prefixes)),
               m_tables(std::move(tables)),
               m_settings(std::move(settings)) { }
+
+        Spec(const Spec &) = delete;
+        Spec &operator=(const Spec &) = delete;
+
+        Spec(Spec &&) = default;
+        Spec &operator=(Spec &&) = default;
 
         [[nodiscard]] const std::string& getName() const noexcept { return m_name; }
         [[nodiscard]] const std::vector<Opcode>& getOpcodes() const noexcept { return m_opcodes; }
