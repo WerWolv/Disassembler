@@ -11,7 +11,7 @@ namespace disasm::spec {
 
     class Opcode {
     public:
-        Opcode(std::string mnemonic, std::string mask, std::string format, std::string sizeof_spec, nlohmann::json metadata);
+        Opcode(std::string mnemonic, std::string mask, std::string format, std::string sizeofSpec, std::string ifSpec, nlohmann::json metadata);
 
         [[nodiscard]] const std::string& getMnemonic() const { return this->m_mnemonic; }
         [[nodiscard]] std::optional<std::string> format(u64 address, std::span<const u8> bytes, const std::map<std::string, std::vector<std::string>> &tables, const std::map<std::string, i64> &variables) const;
@@ -29,6 +29,7 @@ namespace disasm::spec {
         std::string m_mnemonic;
         std::string m_format;
         std::string m_sizeof;
+        std::string m_ifSpec;
         nlohmann::json m_metadata;
 
         BitPattern  m_bitPattern;

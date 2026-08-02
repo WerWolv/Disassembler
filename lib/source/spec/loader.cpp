@@ -21,17 +21,19 @@ namespace disasm::spec {
         throw std::runtime_error("Could not find file: " + path.string());
     }
 
-    Spec Loader::load(const std::string& string, const std::vector<std::fs::path> &includeDirectories) {
-        try {
-            auto json = nlohmann::json::parse(string);
+    namespace {
 
-            std::vector<Opcode> prefixes;
-            std::vector<Opcode> opcodes;
-            for (const auto &includePath : json["includes"].get<std::vector<std::string>>()) {
-                Spec includedSpec = load(includePath, includeDirectories);
-                std::ranges::copy(includedSpec.getOpcodes(), std::back_inserter(opcodes));
-            }
+        Opcode parseOpcode(const nlohmann::json& json) {
+            return {
+                json["mnemonic"],
+                json["mask"],
+                json["format"],
+                json.contains("sizeof") ? json["sizeof"] : "",
+                json.contains("metadata") ? json["metadata"] : nlohmann::json()
+            };
+        }
 
+        std::map<std::string, std::vector<std::string>> parseTables(const nlohmann::json& json) {
             std::map<std::string, std::vector<std::string>> tables;
             if (json.contains("tables")) {
                 for (const auto &object : json["tables"].items()) {
@@ -46,6 +48,10 @@ namespace disasm::spec {
                 }
             }
 
+            return tables;
+        }
+
+        std::vector<std::unique_ptr<Setting>> parseSettings(const nlohmann::json& json) {
             std::vector<std::unique_ptr<Setting>> settings;
             if (json.contains("settings") && json["settings"].is_array()) {
                 for (const auto &entry : json["settings"].items()) {
@@ -92,21 +98,54 @@ namespace disasm::spec {
                 }
             }
 
+            return settings;
+        }
+
+    }
+
+    Spec Spec::mergeSpecs(std::vector<Spec> &&specs) {
+        Spec resultSpec;
+
+        for (auto &spec : specs) {
+            std::ranges::move(spec.m_opcodes, std::back_inserter(resultSpec.m_opcodes));
+            std::ranges::move(spec.m_prefixes, std::back_inserter(resultSpec.m_prefixes));
+            std::ranges::move(spec.m_tables, std::inserter(resultSpec.m_tables, resultSpec.m_tables.end()));
+            std::ranges::move(spec.m_settings, std::back_inserter(resultSpec.m_settings));
+        }
+        return resultSpec;
+    }
+
+    Spec Loader::load(const std::string& string, const std::vector<std::fs::path> &includeDirectories) {
+        try {
+            auto json = nlohmann::json::parse(string);
+
+            std::vector<Spec> specs;
+            for (const auto &includePath : json["includes"].get<std::vector<std::string>>()) {
+                specs.emplace_back(load(includePath, includeDirectories));
+            }
+
+            auto tables = parseTables(json);
+            auto settings = parseSettings(json);
+
+            std::vector<Opcode> opcodes;
             for (const auto &opcode : json["opcodes"]) {
-                opcodes.emplace_back(opcode["mnemonic"], opcode["mask"], opcode["format"], opcode.contains("sizeof") ? opcode["sizeof"] : "", opcode.contains("metadata") ? opcode["metadata"] : nlohmann::json());
+                opcodes.emplace_back(parseOpcode(opcode));
             }
 
+            std::vector<Opcode> prefixes;
             for (const auto &opcode : json["prefixes"]) {
-                prefixes.emplace_back(opcode["mnemonic"], opcode["mask"], opcode["format"], opcode.contains("sizeof") ? opcode["sizeof"] : "", opcode.contains("metadata") ? opcode["metadata"] : nlohmann::json());
+                prefixes.emplace_back(parseOpcode(opcode));
             }
 
-            return Spec {
+            specs.emplace_back(
                 json["name"].get<std::string>(),
                 std::move(opcodes),
                 std::move(prefixes),
                 std::move(tables),
                 std::move(settings)
-            };
+            );
+
+            return Spec::mergeSpecs(std::move(specs));
         } catch (const std::exception &e) {
             throw std::runtime_error(fmt::format("Error while parsing file: {}", e.what()));
         }

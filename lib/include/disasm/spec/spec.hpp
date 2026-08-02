@@ -86,6 +86,7 @@ namespace disasm::spec {
 
         [[nodiscard]] std::vector<Disassembly> disassemble(std::span<const u8> bytes, std::size_t instructionCount = 0, const std::map<std::string, i64> &variables = {}) const;
 
+        static Spec mergeSpecs(std::vector<Spec> &&specs);
     private:
         std::string m_name;
         std::vector<Opcode> m_opcodes, m_prefixes;
