@@ -112,7 +112,9 @@ namespace disasm::spec {
             std::ranges::move(spec.m_prefixes, std::back_inserter(resultSpec.m_prefixes));
             std::ranges::move(spec.m_tables, std::inserter(resultSpec.m_tables, resultSpec.m_tables.end()));
             std::ranges::move(spec.m_settings, std::back_inserter(resultSpec.m_settings));
+            resultSpec.m_name = spec.m_name;
         }
+
         return resultSpec;
     }
 
