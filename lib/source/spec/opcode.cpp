@@ -24,22 +24,23 @@ namespace disasm::spec {
             const auto value = args[0];
             auto size = args[1];
 
-            if constexpr (Endian == std::endian::native)
+            if constexpr (Endian == std::endian::native) {
                 return value;
+            } else {
+                size = std::min<size_t>(size, sizeof(i64));
 
-            size = std::min<size_t>(size, sizeof(i64));
+                std::array<uint8_t, sizeof(i64)> data = { };
+                std::memcpy(data.data(), &value, size);
 
-            std::array<uint8_t, sizeof(i64)> data = { };
-            std::memcpy(data.data(), &value, size);
+                for (uint32_t i = 0; i < size / 2; i++) {
+                    std::swap(data[i], data[size - 1 - i]);
+                }
 
-            for (uint32_t i = 0; i < size / 2; i++) {
-                std::swap(data[i], data[size - 1 - i]);
+                i64 result = { };
+                std::memcpy(&result, data.data(), size);
+
+                return result;
             }
-
-            i64 result = { };
-            std::memcpy(&result, data.data(), size);
-
-            return result;
         }
 
         void registerFunctions(wolv::math_eval::MathEvaluator<i64> &mathEvaluator) {
@@ -188,4 +189,3 @@ namespace disasm::spec {
     }
 
 }
-
